@@ -114,12 +114,15 @@ void test_param(FILE *params, FILE *line_to_read){
     
   /* Indice param, init, resol and final to be changed manually to give the parameter and its range */  
   int indice_param = 1; //1 for WEIGHT1; 2 for WEIGHT2 etc...
-  float init = 1; float resol = 1; float final = 10;
-  int row = 1 + (final-init)/resol + 1;
+  float init = 1; float resol = 1; float final = 10; int nb_param_tuned = 3; 
+  int row = 1 + pow((floor(final-init)/resol + 1),nb_param_tuned);
+  printf("nb lines %d\n", row);
   int col = 5;
   
   //Create a .csv file with the different information about the simulation tested
-  asprintf (&file_name, "Test_parameters_WEIGHT%d_[%.3f,%.3f,%.3f].csv", indice_param, init, resol, final);
+  //asprintf (&file_name, "Test_parameters_WEIGHT%d_[%.3f,%.3f,%.3f].csv", indice_param, init, resol, final);
+  asprintf (&file_name, "Test_parameters_WEIGHT Reynolds_[%.3f,%.3f,%.3f].csv", init, resol, final);
+
   
   //Allocate space to store usefull param for the current simulation
   data_glob = (double **)malloc(row * sizeof(double *));
@@ -147,7 +150,7 @@ void test_param(FILE *params, FILE *line_to_read){
     fclose(line_to_read);
   }
   
-  //Depending on the existence of the file, read or create + read it, and extract parameters usefull for the current simulation  
+  //Depending on the existence of the parameter file, read or create + read it, and extract parameters usefull for the current simulation  
   if((params = fopen(file_name, "r"))){
     printf("File already existing\n");	
     
@@ -166,10 +169,17 @@ void test_param(FILE *params, FILE *line_to_read){
     params = fopen(file_name, "w");
     fprintf(params, "%d,%d\n", row, col);
     //fprintf(params, "File created\n"); 
-    float i = init; 
+    float i = init; float j = init; float k = init;  
     for(i=init; i<=final; i += resol){
-      weights[indice_param-1] = i;
-      fprintf(params, "%.3f,%.3f,%.3f,%.3f,%.3f\n", weights[0], weights[1],weights[2], weights[3], weights[4]);
+      for(j=init; j<=final; j += resol){
+        for(k=init; k<=final; k+=resol){
+          weights[2] = i;
+          weights[1] = j;
+          weights[0] = k;
+          fprintf(params, "%.3f,%.3f,%.3f,%.3f,%.3f\n", weights[0], weights[1],weights[2], weights[3], weights[4]);
+          //printf("%.3f,%.3f,%.3f,%.3f,%.3f\n", weights[0], weights[1],weights[2], weights[3], weights[4]);
+        }
+      }
     }
     read_csv(row, col, file_name, data_glob);
     fclose(params);

@@ -149,7 +149,7 @@ static void reset()
 	robot_id = robot_id_u%FLOCK_SIZE;	  		    // normalize between 0 and FLOCK_SIZE-1
 	robot_flock_id = (robot_id_u / FLOCK_SIZE) + 1; // flock ID needed for scenario 2
 
-	printf("Reset robot %d :: [id][flock_id]   [%d][%d]\n",robot_id_u, robot_id, robot_flock_id);
+	//printf("Reset robot %d :: [id][flock_id]   [%d][%d]\n",robot_id_u, robot_id, robot_flock_id);
 }
 
 
@@ -203,7 +203,7 @@ void update_self_motion(int msl, int msr) {
 	float dl = (float)msl * SPEED_UNIT_RADS * WHEEL_RADIUS * DELTA_T;
 	float du = (dr + dl)/2.0;
 	float dtheta = (dr - dl)/AXLE_LENGTH;
-    if(robot_id == 0 && VERBOSE){printf("dr %f dl %f du %f dtheta %f\n",dr,dl,du,dtheta);}
+    //if(robot_id == 0 && VERBOSE){printf("dr %f dl %f du %f dtheta %f\n",dr,dl,du,dtheta);}
 	
 	// Compute deltas in the environment
 	float dx = du * cosf(theta+dtheta/2);
@@ -349,11 +349,11 @@ void reynolds_rules() {
 		if(dist > RULE1_THRESHOLD){
 			cohesion[j] = rel_avg_loc[j];
 		}
-		if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("R1 dist [%f] :: coehsion [%f][%f]\n", dist, cohesion[0], cohesion[1]); }
+		//if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("R1 dist [%f] :: coehsion [%f][%f]\n", dist, cohesion[0], cohesion[1]); }
 	}
 
 	// Rule 2 - Dispersion/Separation: keep far enough from flockmates
-	if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("R2 distances :: ]\n"); }
+	//if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("R2 distances :: ]\n"); }
 
 	for(k=0;k<FLOCK_SIZE;k++){
 		if(k == robot_id){
@@ -369,12 +369,12 @@ void reynolds_rules() {
 			}
 		}
 	}	
-	if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("\nR2 dispersion [%f][%f]", dispersion[0], dispersion[1]); }
+	//if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("\nR2 dispersion [%f][%f]", dispersion[0], dispersion[1]); }
   
 	// Rule 3 - Consistency/Alignment: match the speeds of flockmates
 	for (j=0;j<2;j++){
 		consistency[j] = rel_avg_speed[j];
-		if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("R3 consistency [%f][%f]\n", consistency[0], consistency[1]); }
+		//if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("R3 consistency [%f][%f]\n", consistency[0], consistency[1]); }
 
 	}
 
@@ -383,7 +383,7 @@ void reynolds_rules() {
 		speed[robot_id][j] = cohesion[j] * RULE1_WEIGHT;
 		speed[robot_id][j] +=  dispersion[j] * RULE2_WEIGHT;
 		speed[robot_id][j] +=  consistency[j] * RULE3_WEIGHT;
-		if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("ACC  [%1.7f][%1.7f][%1.7f]\n", cohesion[j] * RULE1_WEIGHT, dispersion[j] * RULE2_WEIGHT, consistency[j] * RULE3_WEIGHT); }
+		//if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("ACC  [%1.7f][%1.7f][%1.7f]\n", cohesion[j] * RULE1_WEIGHT, dispersion[j] * RULE2_WEIGHT, consistency[j] * RULE3_WEIGHT); }
 
 	}
 }
@@ -449,15 +449,15 @@ void sim_receive_message(void)
 		wb_receiver_next_packet(receiver2);
 	}
 
-	if(VERBOSE && (ROBOT_DEBUG == robot_id)){
-		printf("[%d] has flockmates ", robot_id);
-		for(int i = 0;i<FLOCK_SIZE;i++){
-			if(flockmates[i]){
-				printf("[%d]", i);
-			}
-		}
-		printf("\n");
-	}
+	//if(VERBOSE && (ROBOT_DEBUG == robot_id)){
+		//printf("[%d] has flockmates ", robot_id);
+		//for(int i = 0;i<FLOCK_SIZE;i++){
+		//	if(flockmates[i]){
+		//		printf("[%d]", i);
+		//	}
+		//}
+		//printf("\n");
+	//}
 }
 
 double get_bearing(WbDeviceTag tag) {
@@ -494,7 +494,7 @@ float set_final_speed(int b_speed, int r_speed, int m_speed, int max_sens) {  //
   		
 	}
 
-	if(ROBOT_DEBUG == robot_id && VERBOSE){printf("[wb] [%f] :: [wm] [%f] :: [wr] [%f]\n", wb, wm, wr);}
+	//if(ROBOT_DEBUG == robot_id && VERBOSE){printf("[wb] [%f] :: [wm] [%f] :: [wr] [%f]\n", wb, wm, wr);}
 
 	final_speed = wb * b_speed + wm * m_speed + wr * r_speed;
 	f_computeNot = ~f_computeNot;
@@ -531,7 +531,7 @@ int main(){
 	
 	// Forever
 	for(;;){
-		if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("\n"); }
+		//if(VERBOSE && ROBOT_DEBUG == robot_id){ printf("\n"); }
 
 		// reset flockmates list. It's populated by sim_receive_message
 		for(i=0;i<FLOCK_SIZE;i++){flockmates[i] = 0;}
@@ -565,7 +565,7 @@ int main(){
 			bmsl = bmsl + BRAITENBERG_SPEED_BIAS < MAX_SPEED ? bmsl + BRAITENBERG_SPEED_BIAS : bmsl;
 			bmsr = bmsr + BRAITENBERG_SPEED_BIAS < MAX_SPEED ? bmsr + BRAITENBERG_SPEED_BIAS : bmsr;
 
-        }	
+                      }	
 
 		// Send and get information 
 		sim_send_message(); // sending a ping to other robot, so they can measure their distance to this robot
@@ -592,9 +592,9 @@ int main(){
 
 		}		
 		
-        /* Added by Pauline*/
+                      /* Added by Pauline*/
 		// Set final speed
-        msl = set_final_speed(bmsl,  rmsl,  mmsl,  max_sens);
+                      msl = set_final_speed(bmsl,  rmsl,  mmsl,  max_sens);
 		msr = set_final_speed(bmsr,  rmsr,  mmsr, max_sens);
 				  
 		// Set speed
